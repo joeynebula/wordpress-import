@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Refinery::WordPress::Attachment, :type => :model do
+describe WordPressImport::Attachment, :type => :model do
   context "an image attchment" do
     let(:attachment) { test_dump.attachments.first }
 

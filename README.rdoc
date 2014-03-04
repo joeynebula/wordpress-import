@@ -1,8 +1,10 @@
-= Refinerycms-wordpress-import
+= Wordpress-import
 
-This litte project is an importer for WordPress XML dumps into refinerycms(-blog). 
+Fork of Marc Remolt's Refinerycms-wordpress-import ( https://github.com/mremolt/refinerycms-wordpress-import )
 
-You can find the source code on github: https://github.com/mremolt/refinerycms-wordpress-import
+This little project is an importer for WordPress XML dumps into Rails
+
+You can find the source code on github: https://github.com/zyphlar/wordpress-import
 
 Keep in mind that links to other pages of your blog are just copied, as WordPress exports them as <a>-Tags. 
 If your site (blog) structure uses new urls, the links WILL break! For example, if you used 
@@ -12,20 +14,18 @@ So your inner site links will point to the old WP url.
 
 == Prerequisites
 
-As refinerycms-wordpress-import is an addon for RefineryCMS, is shares the prerequisites with it.
-So you'll first need a running installation of refinerycms and refinerycms-blog. Make sure
-the site is running, all migrations are run and you created the first refinery user. 
+TODO
 
 
 == Installation
 
 Just add the gem to your projects Gemfile:
 
-  gem 'refinerycms-wordpress-import'
+  gem 'wordpress-import'
 
 Or if you want to stay on the bleeding edge: 
 
-  gem 'refinerycms-wordpress-import', :git => 'git://github.com/mremolt/refinerycms-wordpress-import.git'
+  gem 'wordpress-import', :git => 'git://github.com/zyphlarz/wordpress-import.git'
 
 and run
 

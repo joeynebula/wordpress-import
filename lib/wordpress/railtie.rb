@@ -1,9 +1,7 @@
-module Refinery
-  module WordPress
-    class Railtie < Rails::Railtie
-      rake_tasks do
-        load "tasks/wordpress.rake"
-      end
+module WordPressImport
+  class Railtie < Rails::Railtie
+    rake_tasks do
+      load "tasks/wordpress.rake"
     end
   end
 end

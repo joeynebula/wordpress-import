@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe Refinery::WordPress::Dump, :type => :model do
+describe WordPressImport::Dump, :type => :model do
   let(:dump) { test_dump }
 
   it "should create a Dump object given a xml file" do
-    dump.should be_a Refinery::WordPress::Dump
+    dump.should be_a WordPressImport::Dump
   end
 
   it "should include a Nokogiri::XML object" do
@@ -13,12 +13,12 @@ describe Refinery::WordPress::Dump, :type => :model do
 
   describe "#tags" do
     let(:tags) do
-      [ Refinery::WordPress::Tag.new('css'), Refinery::WordPress::Tag.new('html'),
-        Refinery::WordPress::Tag.new('php'), Refinery::WordPress::Tag.new('ruby')]
+      [ WordPressImport::Tag.new('css'), WordPressImport::Tag.new('html'),
+        WordPressImport::Tag.new('php'), WordPressImport::Tag.new('ruby')]
     end
 
     specify { dump.tags.count == 4 }
-    specify { dump.tags.first.should be_a(Refinery::WordPress::Tag) }
+    specify { dump.tags.first.should be_a(WordPressImport::Tag) }
 
     it "should return all included tags" do
       tags.each do |tag|
@@ -29,12 +29,12 @@ describe Refinery::WordPress::Dump, :type => :model do
 
   describe "#categories" do
     let(:categories) do
-      [ Refinery::WordPress::Category.new('Rant'), Refinery::WordPress::Category.new('Tutorials'),
-       Refinery::WordPress::Category.new('Uncategorized') ]
+      [ WordPressImport::Category.new('Rant'), WordPressImport::Category.new('Tutorials'),
+       WordPressImport::Category.new('Uncategorized') ]
     end
 
     specify { dump.categories.count == 4 }
-    specify { dump.categories.first.should be_a(Refinery::WordPress::Category) }
+    specify { dump.categories.first.should be_a(WordPressImport::Category) }
 
     it "should return all included categories" do
       categories.each do |cat|
@@ -48,7 +48,7 @@ describe Refinery::WordPress::Dump, :type => :model do
       dump.pages.should have(3).pages
     end
 
-    specify { dump.pages.first.should be_a(Refinery::WordPress::Page) }
+    specify { dump.pages.first.should be_a(WordPressImport::Page) }
 
     it "should return only published pages with only_published=true" do
       dump.pages(true).should have(2).pages
@@ -60,7 +60,7 @@ describe Refinery::WordPress::Dump, :type => :model do
       dump.authors.should have(1).author
     end
 
-    specify { dump.authors.first.should be_a(Refinery::WordPress::Author) }
+    specify { dump.authors.first.should be_a(WordPressImport::Author) }
   end
 
   describe "#posts" do
@@ -68,7 +68,7 @@ describe Refinery::WordPress::Dump, :type => :model do
       dump.posts.should have(3).posts
     end
 
-    specify { dump.posts.first.should be_a(Refinery::WordPress::Post) }
+    specify { dump.posts.first.should be_a(WordPressImport::Post) }
 
     it "should return only published posts with only_published=true" do
       dump.posts(true).should have(2).posts
@@ -80,6 +80,6 @@ describe Refinery::WordPress::Dump, :type => :model do
       dump.attachments.should have(2).attachments
     end
 
-    specify { dump.attachments.first.should be_a(Refinery::WordPress::Attachment) }
+    specify { dump.attachments.first.should be_a(WordPressImport::Attachment) }
   end
 end

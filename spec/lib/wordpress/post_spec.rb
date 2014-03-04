@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Refinery::WordPress::Post, :type => :model do
+describe WordPressImport::Post, :type => :model do
   let(:post) { test_dump.posts.last }
 
    specify { post.title.should == 'Third blog post' }
@@ -17,15 +17,15 @@ describe Refinery::WordPress::Post, :type => :model do
 
   describe "#categories" do
      specify { post.categories.should have(1).category }
-     specify { post.categories.first.should == Refinery::WordPress::Category.new('Rant') }
+     specify { post.categories.first.should == WordPressImport::Category.new('Rant') }
   end
 
   describe "#tags" do
      specify { post.tags.should have(3).tags }
 
-     specify { post.tags.should include(Refinery::WordPress::Tag.new('css')) }
-     specify { post.tags.should include(Refinery::WordPress::Tag.new('html')) }
-     specify { post.tags.should include(Refinery::WordPress::Tag.new('php')) }
+     specify { post.tags.should include(WordPressImport::Tag.new('css')) }
+     specify { post.tags.should include(WordPressImport::Tag.new('html')) }
+     specify { post.tags.should include(WordPressImport::Tag.new('php')) }
   end
 
    specify { post.tag_list.should == 'css,html,php' }

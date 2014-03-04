@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-describe Refinery::WordPress::Tag, :type => :model do
-  let(:tag) { Refinery::WordPress::Tag.new('ruby') }
+describe WordPressImport::Tag, :type => :model do
+  let(:tag) { WordPressImport::Tag.new('ruby') }
 
   describe "#name" do
     specify { tag.name.should == 'ruby' }
   end
 
   describe "#==" do
-    specify { tag.should == Refinery::WordPress::Tag.new('ruby') }
-    specify { tag.should_not == Refinery::WordPress::Tag.new('php') }
+    specify { tag.should == WordPressImport::Tag.new('ruby') }
+    specify { tag.should_not == WordPressImport::Tag.new('php') }
   end
 
   describe "#to_refinery" do

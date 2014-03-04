@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Refinery::WordPress::Page, :type => :model do
+describe WordPressImport::Page, :type => :model do
   let(:dump) { test_dump }
 
   let(:page) { test_dump.pages.last }

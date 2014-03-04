@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Refinery::WordPress::Author, :type => :model do
+describe WordPressImport::Author, :type => :model do
   let(:author) { test_dump.authors.first }
 
   specify { author.login.should == 'admin' }

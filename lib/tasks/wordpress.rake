@@ -13,24 +13,24 @@ namespace :wordpress do
 
   end
 
-  desc "import blog data from a Refinery::WordPress XML dump"
+  desc "import blog data from a WordPressImport XML dump"
   task :import_blog, :file_name do |task, params|
     Rake::Task["environment"].invoke
-    dump = Refinery::WordPress::Dump.new(params[:file_name])
+    dump = WordPressImport::Dump.new(params[:file_name])
 
     dump.authors.each(&:to_refinery)
     
     only_published = ENV['ONLY_PUBLISHED'] == 'true' ? true : false
     dump.posts(only_published).each(&:to_refinery)
 
-    Refinery::WordPress::Post.create_blog_page_if_necessary
+    WordPressImport::Post.create_blog_page_if_necessary
 
     ENV["MODEL"] = 'BlogPost'
     Rake::Task["friendly_id:redo_slugs"].invoke
     ENV.delete("MODEL")
   end
 
-  desc "reset blog tables and then import blog data from a Refinery::WordPress XML dump"
+  desc "reset blog tables and then import blog data from a WordPressImport XML dump"
   task :reset_and_import_blog, :file_name do |task, params|
     Rake::Task["environment"].invoke
     Rake::Task["wordpress:reset_blog"].invoke
@@ -51,7 +51,7 @@ namespace :wordpress do
   desc "import cms data from a WordPress XML dump"
   task :import_pages, :file_name do |task, params|
     Rake::Task["environment"].invoke
-    dump = Refinery::WordPress::Dump.new(params[:file_name])
+    dump = WordPressImport::Dump.new(params[:file_name])
 
     only_published = ENV['ONLY_PUBLISHED'] == 'true' ? true : false
     dump.pages(only_published).each(&:to_refinery)
@@ -65,7 +65,7 @@ namespace :wordpress do
       page.save!
     end
 
-    Refinery::WordPress::Post.create_blog_page_if_necessary
+    WordPressImport::Post.create_blog_page_if_necessary
         
     ENV["MODEL"] = 'Page'
     Rake::Task["friendly_id:redo_slugs"].invoke
@@ -93,7 +93,7 @@ namespace :wordpress do
   desc "import media data (images and files) from a WordPress XML dump and replace target URLs in pages and posts"
   task :import_and_replace_media, :file_name do |task, params|
     Rake::Task["environment"].invoke
-    dump = Refinery::WordPress::Dump.new(params[:file_name])
+    dump = WordPressImport::Dump.new(params[:file_name])
     
     attachments = dump.attachments.each(&:to_refinery)
     

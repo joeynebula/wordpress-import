@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-describe Refinery::WordPress::Category, :type => :model do
-  let(:category) { Refinery::WordPress::Category.new('Rant') }
+describe WordPressImport::Category, :type => :model do
+  let(:category) { WordPressImport::Category.new('Rant') }
 
   describe "#name" do
     specify { category.name.should == 'Rant' }
   end
 
   describe "#==" do
-    specify { category.should == Refinery::WordPress::Category.new('Rant') }
-    specify { category.should_not == Refinery::WordPress::Category.new('Tutorials') }
+    specify { category.should == WordPressImport::Category.new('Rant') }
+    specify { category.should_not == WordPressImport::Category.new('Tutorials') }
   end
 
   describe "#to_refinery" do
