@@ -11,6 +11,10 @@ If your site (blog) structure uses new urls, the links WILL break! For example, 
 the popular WP blog url structure "YYYY-MM/slug", be warned that Refinery just uses "blog/slug". 
 So your inner site links will point to the old WP url. 
 
+== TODO
+- attachments
+- categories
+- tags
 
 == Prerequisites
 

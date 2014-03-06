@@ -38,7 +38,15 @@ module WordPressImport
     end
 
     def post_date
-      DateTime.parse node.xpath("wp:post_date").text
+      Time.parse node.xpath("wp:post_date").text
+    end
+
+    def publish_date
+      Time.parse node.xpath("pubDate").text
+    end
+
+    def post_name
+      node.xpath("wp:post_name").text
     end
 
     def post_id
@@ -67,7 +75,7 @@ module WordPressImport
     end
 
     #NEED:
-    # dc:creator ->  "user_id"
+    # creator ->  "user_id"
     # wp:post_name ->   "slug"
     # pubDate -> "published_at"
     #OK:
@@ -75,12 +83,11 @@ module WordPressImport
     # content:encoded ->     "body"
     # wp:post_date_gmt -> "created_at"
 
-    def to_refinery
+    def to_rails
+      # :user_id => creator
       page = ::Page.create!(:id => post_id, :title => title, 
-        :created_at => post_date, :draft => draft?)
-
-      page.parts.create(:title => 'Body', :body => content_formatted)
-      page
+        :created_at => post_date, :slug => post_name, 
+        :published_at => publish_date, :body => content_formatted)
     end
 
     private 
@@ -92,7 +99,7 @@ module WordPressImport
       text = ''.html_safe if text.nil?
       start_tag = tag('p', html_options, true)
       
-      text.gsub!(/\r\n?/, "\n")                    # \r\n and \r -> \n
+      text.gsub!(/\r?\n/, "<br/>\n")               # \r\n and \n -> line break
       text.gsub!(/\n\n+/, "</p>\n\n#{start_tag}")  # 2+ newline  -> paragraph
       text.insert 0, start_tag
 

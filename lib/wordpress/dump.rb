@@ -9,6 +9,11 @@ module WordPressImport
         unless File.file?(file_name) && File.readable?(file_name)
       
       file = File.open(file_name)
+      
+      if file.size >= 10485760 # 10MB
+        puts "WARNING: LibXML by default supports 10MB max file size. On some systems your file will be silently truncated; on others, an error will be raised. Consider splitting your file into smaller chunks, or double-checking the import results."
+      end
+
       @doc = Nokogiri::XML(file)
     end
 

@@ -6,6 +6,12 @@ module WordPressImport
       @author_node = author_node
     end
 
+    def name
+      name = author_node.xpath("wp:author_display_name").text
+      name = author_node.xpath("wp:author_first_name").text + " " + author_node.xpath("wp:author_first_name").text if name.blank?
+      name
+    end
+
     def login
       author_node.xpath("wp:author_login").text
     end
@@ -22,13 +28,16 @@ module WordPressImport
       "WordPress::Author: #{login} <#{email}>"
     end
 
-    def to_refinery
-      user = User.find_or_initialize_by_username_and_email(login, email)
+    def to_rails
+      user = ::User.find_or_initialize_by_email(email)
+      user.wp_username = login
+
       unless user.persisted?
+        user.name = name
         user.password = 'password'
         user.password_confirmation = 'password'
-        user.save
       end
+      user.save
       user
     end
   end

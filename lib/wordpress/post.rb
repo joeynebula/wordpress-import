@@ -29,53 +29,40 @@ module WordPressImport
       end
     end
 
-    def to_refinery
-      user = ::User.find_by_username(creator) || ::User.first
-      raise "Referenced User doesn't exist! Make sure the authors are imported first." \
-        unless user
+    def to_rails
 
-      begin
-        post = ::BlogPost.new :title => title, :body => content_formatted,
-          :draft => draft?, :published_at => post_date, :created_at => post_date,
-          :user_id => user.id, :tag_list => tag_list
-        post.save!
+      user = ::User.find_by_wp_username(creator)
 
-        ::BlogPost.transaction do
-          categories.each do |category|
-            post.categories << category.to_refinery
-          end
-
-          comments.each do |comment|
-            comment = comment.to_refinery
-            comment.post = post
-            comment.save
-          end
-        end
-      rescue ActiveRecord::RecordInvalid
-        # if the title has already been taken (WP allows duplicates here,
-        # refinery doesn't) append the post_id to it, making it unique
-        post.title = "#{title}-#{post_id}"
-        post.save
+      if user.nil? 
+        raise "User with wp_username #{creator} not found"
       end
 
-      post
-    end
+      post = ::Post.find_or_initialize_by(:id => post_id, :slug => post_name)
 
-    def self.create_blog_page_if_necessary
-      # refinerycms wants a page at /blog, so let's make sure there is one
-      # taken from the original db seeds from refinery-blog
-      unless ::Page.where("link_url = ?", '/blog').exists?
-        page = ::Page.create(
-          :title => "Blog",
-          :link_url => "/blog",
-          :deletable => false,
-          :position => ((::Page.maximum(:position, :conditions => {:parent_id => nil}) || -1)+1),
-          :menu_match => "^/blogs?(\/|\/.+?|)$"
-        )
+      post.assign_attributes( 
+        :user_id => user.id, :title => title, 
+        :created_at => post_date, 
+        :published_at => publish_date)
+      # :body => content_formatted taken care of by translation below
 
-        ::Page.default_parts.each do |default_page_part|
-          page.parts.create(:title => default_page_part, :body => nil)
-        end
+      if post.translations.blank?
+        translation = post.translations.build
+      else
+        translation = post.translations.first
+      end
+      
+      translation.locale = "en"
+      translation.title = title
+      translation.body = content_formatted
+      translation.save
+      
+      post.save
+
+      if post.errors.blank?
+        return post.reload
+      else
+        puts post.inspect
+        raise post.errors.full_messages.to_s
       end
     end
 
