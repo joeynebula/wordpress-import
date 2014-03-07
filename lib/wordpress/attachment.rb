@@ -50,8 +50,9 @@ module WordPressImport
       rescue Exception => ex
         message = "ERROR saving attachment #{url} -- #{ex.message}"
         p message
-        $ATTACHMENT_EXCEPTIONS = [] if $ATTACHMENT_EXCEPTIONS.blank? 
+        $ATTACHMENT_EXCEPTIONS = [] if $ATTACHMENT_EXCEPTIONS.blank?
         $ATTACHMENT_EXCEPTIONS << message
+        return nil
       end
     end
 
@@ -67,16 +68,16 @@ module WordPressImport
 
     private
 
-    def rich_file_clean_file_name(full_file_name)     
+    def rich_file_clean_file_name(full_file_name)
       extension = File.extname(full_file_name).gsub(/^\.+/, '')
       filename = full_file_name.gsub(/\.#{extension}$/, '')
-      
+
       filename = CGI::unescape(filename)
       filename = CGI::unescape(filename)
-      
+
       extension = extension.downcase
       filename = filename.downcase.gsub(/[^a-z0-9]+/i, '-')
-      
+
       "#{filename}.#{extension}"
     end
 
@@ -115,6 +116,7 @@ module WordPressImport
       file
     end
 
+
     def replace_image_url
       replace_image_url_in_blog_posts
       replace_image_url_in_pages
@@ -143,8 +145,7 @@ module WordPressImport
 
     def replace_url_in_blog_posts(new_url)
       ::Post.all.each do |post|
-        byebug if post.id == 168
-        if ((! post.body.empty?) && post.body.include?(url))
+        if (! post.body.empty?) && post.body.include?(url)
           @occurrance_count++
           post.body = post.body.gsub(url_pattern, new_url)
           post.save!
