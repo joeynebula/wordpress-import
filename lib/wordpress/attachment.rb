@@ -1,8 +1,8 @@
 module WordPressImport
   class Attachment
     attr_reader :node
-    attr_reader :refinery_image
-    attr_reader :refinery_resource
+    attr_reader :paperclip_image
+    attr_reader :paperclip_file
 
     def initialize(node)
       @node = node
@@ -40,42 +40,79 @@ module WordPressImport
       url.match /\.(png|jpg|jpeg|gif)$/ 
     end
 
-    def to_refinery
-      if image?
-        to_image
-      else
-        to_resource
+    def to_rails
+      begin
+        if image?
+          to_image
+        else
+          to_file
+        end
+      rescue Exception => ex
+        message = "ERROR saving attachment #{url} -- #{ex.message}"
+        p message
+        $ATTACHMENT_EXCEPTIONS = [] if $ATTACHMENT_EXCEPTIONS.blank? 
+        $ATTACHMENT_EXCEPTIONS << message
       end
     end
 
     def replace_url
+      @occurrance_count = 0
       if image?
         replace_image_url
       else
         replace_resource_url
       end
+      p "Replaced #{@occurrance_count} occurrances of #{url}"
     end
 
     private
 
-    def to_image
-      image = ::Image.new
-      image.created_at = post_date
-      image.image_url = url
-      image.save!
+    def rich_file_clean_file_name(full_file_name)     
+      extension = File.extname(full_file_name).gsub(/^\.+/, '')
+      filename = full_file_name.gsub(/\.#{extension}$/, '')
+      
+      filename = CGI::unescape(filename)
+      filename = CGI::unescape(filename)
+      
+      extension = extension.downcase
+      filename = filename.downcase.gsub(/[^a-z0-9]+/i, '-')
+      
+      "#{filename}.#{extension}"
+    end
 
-      @refinery_image = image
+    def to_image
+      # avoid duplicates; use our storage system's filename cleaner for lookup
+      image = ::Rich::RichFile.find_or_initialize_by(rich_file_file_name: rich_file_clean_file_name(file_name))
+
+      if image.rich_file.instance.id.blank?
+        p "Importing image #{file_name}"
+        image.simplified_type = "image"
+        image.created_at = post_date
+        image.rich_file = URI.parse(url)
+        image.save!
+      else
+        p "image #{file_name} already exists..."
+      end
+
+      @paperclip_image = image
       image
     end
 
-    def to_resource
-      resource = ::Resource.new
-      resource.created_at = post_date
-      resource.file_url = url
-      resource.save!
+    def to_file
+      # avoid duplicates; use our storage system's filename cleaner for lookup
+      file = ::Rich::RichFile.find_or_initialize_by(rich_file_file_name: rich_file_clean_file_name(file_name))
 
-      @refinery_resource = resource
-      resource
+      if file.rich_file.instance.id.blank?
+        p "Importing file #{file_name}"
+        file.created_at = post_date
+        file.rich_file = URI.parse(url) if file.rich_file.blank?
+        file.save!
+      else
+        p "file #{file_name} already exists..."
+      end
+
+      @paperclip_file = file
+      file
     end
 
     def replace_image_url
@@ -89,24 +126,26 @@ module WordPressImport
     end
 
     def replace_image_url_in_blog_posts
-      replace_url_in_blog_posts(refinery_image.image.url)
+      replace_url_in_blog_posts(paperclip_image.rich_file.url)
     end
     
     def replace_image_url_in_pages
-      replace_url_in_pages(refinery_image.image.url)
+      replace_url_in_pages(paperclip_image.rich_file.url)
     end
 
     def replace_resource_url_in_blog_posts
-      replace_url_in_blog_posts(refinery_resource.file.url)
+      replace_url_in_blog_posts(paperclip_file.rich_file.url)
     end
     
     def replace_resource_url_in_pages
-      replace_url_in_pages(refinery_resource.file.url)
+      replace_url_in_pages(paperclip_file.rich_file.url)
     end
 
     def replace_url_in_blog_posts(new_url)
-      ::BlogPost.all.each do |post|
-        if (! post.body.empty?) && post.body.include?(url)
+      ::Post.all.each do |post|
+        byebug if post.id == 168
+        if ((! post.body.empty?) && post.body.include?(url))
+          @occurrance_count++
           post.body = post.body.gsub(url_pattern, new_url)
           post.save!
         end
@@ -115,10 +154,13 @@ module WordPressImport
 
     def replace_url_in_pages(new_url)
       ::Page.all.each do |page|
-        page.parts.each do |part|
-          if (! part.body.to_s.blank?) && part.body.include?(url)
-            part.body = part.body.gsub(url_pattern, new_url)
-            part.save!
+        page.translations.each do |translation|
+          translation.parts.each do |part|
+            if (! part.content.to_s.blank?) && part.content.include?(url)
+              @occurrance_count++
+              part.content = part.content.gsub(url_pattern, new_url)
+              part.save!
+            end
           end
         end
       end

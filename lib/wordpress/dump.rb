@@ -3,15 +3,17 @@ module WordPressImport
     attr_reader :doc
 
     def initialize(file_name)
-      file_name = File.expand_path(file_name)
-
-      raise "Given file '#{file_name}' no file or not readable." \
-        unless File.file?(file_name) && File.readable?(file_name)
+      begin
+        file_name = File.expand_path(file_name)
+        raise "error" unless File.file?(file_name) && File.readable?(file_name)
+      rescue
+        raise "Given file '#{file_name}' is not a file or not readable. Rake tasks take filename arguments like this: rake wordpress:full_import['/path/to/my_file']"
+      end
       
       file = File.open(file_name)
       
       if file.size >= 10485760 # 10MB
-        puts "WARNING: LibXML by default supports 10MB max file size. On some systems your file will be silently truncated; on others, an error will be raised. Consider splitting your file into smaller chunks, or double-checking the import results."
+        puts "WARNING: LibXML by default supports 10MB max file size. On some systems your file will be silently truncated; on others, an error will be raised. Consider splitting your file into smaller chunks and running rake tasks individually (authors, then blog/pages, then media), and double-check the import results."
       end
 
       @doc = Nokogiri::XML(file)
