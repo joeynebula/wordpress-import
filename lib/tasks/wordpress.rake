@@ -99,14 +99,26 @@ namespace :wordpress do
     Rake::Task["environment"].invoke
     dump = WordPressImport::Dump.new(params[:file_name])
     
-    p "Importing #{dump.attachments.each_slice(25).first.count} attachments ..."
-    attachments = dump.attachments.each_slice(25).first.each(&:to_rails)
-    p "Errors were encountered: #{$ATTACHMENT_EXCEPTIONS.inspect}" unless $ATTACHMENT_EXCEPTIONS.blank?
+    p "Importing #{dump.attachments.each_slice(200).first.count} attachments ..."
+    attachments = dump.attachments.each_slice(200).first.each(&:to_rails)
+    unless $ATTACHMENT_EXCEPTIONS.blank?
+      p "----------------------------------------------------------"
+      p "ERRORS WERE ENCOUNTERED IMPORTING ATTACHMENTS:" 
+      $ATTACHMENT_EXCEPTIONS.each{|exception| puts exception}
+      p "----------------------------------------------------------"
+    end
     
     # parse all created Post and Page bodys and replace the old wordpress media urls 
     # with the newly created ones
     p "Replacing attachment URLs found in posts/pages ..."
     attachments.each(&:replace_url)
+
+    unless $REPLACEMENT_EXCEPTIONS.blank?
+      p "----------------------------------------------------------"
+      p "ERRORS WERE ENCOUNTERED REPLACING ATTACHMENTS:" 
+      $REPLACEMENT_EXCEPTIONS.each{|exception| puts exception}
+      p "----------------------------------------------------------"
+    end
   end
 
   desc "reset media tables and then import media data from a WordPress XML dump"

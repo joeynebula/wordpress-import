@@ -47,7 +47,7 @@ module WordPressImport
         else
           to_file
         end
-      rescue Exception => ex
+      rescue StandardError => ex
         message = "ERROR saving attachment #{url} -- #{ex.message}"
         p message
         $ATTACHMENT_EXCEPTIONS = [] if $ATTACHMENT_EXCEPTIONS.blank?
@@ -57,13 +57,21 @@ module WordPressImport
     end
 
     def replace_url
-      @occurrance_count = 0
-      if image?
-        replace_image_url
-      else
-        replace_resource_url
+      begin
+        @occurrance_count = 0
+        if image?
+          replace_image_url
+        else
+          replace_resource_url
+        end
+        p "Replaced #{@occurrance_count} occurrances of #{url}"
+      rescue StandardError => ex
+        message = "ERROR replacing URL #{url} -- #{ex.message}"
+        p message
+        $REPLACEMENT_EXCEPTIONS = [] if $REPLACEMENT_EXCEPTIONS.blank?
+        $REPLACEMENT_EXCEPTIONS << message
+        return nil
       end
-      p "Replaced #{@occurrance_count} occurrances of #{url}"
     end
 
     private
@@ -146,7 +154,7 @@ module WordPressImport
     def replace_url_in_blog_posts(new_url)
       ::Post.all.each do |post|
         if (! post.body.empty?) && post.body.include?(url)
-          @occurrance_count++
+          @occurrance_count += 1
           post.body = post.body.gsub(url_pattern, new_url)
           post.save!
         end
@@ -158,7 +166,7 @@ module WordPressImport
         page.translations.each do |translation|
           translation.parts.each do |part|
             if (! part.content.to_s.blank?) && part.content.include?(url)
-              @occurrance_count++
+              @occurrance_count += 1
               part.content = part.content.gsub(url_pattern, new_url)
               part.save!
             end
