@@ -10,8 +10,8 @@ module WordPressImport
       name == other.name
     end
 
-    def to_refinery
-      BlogCategory.find_or_create_by_title(name)
+    def to_rails
+      Tag.find_or_create_by_title(name)
     end
   end
 end
