@@ -54,6 +54,12 @@ module WordPressImport
       translation.locale = "en"
       translation.title = title
       translation.body = content_formatted
+
+      # merge the translation's category list with the wordpress post's
+      translation.category_list |= categories.collect(&:name)
+      # and tags
+      translation.category_list |= tags.collect(&:name)
+
       translation.save
       
       post.save

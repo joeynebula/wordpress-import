@@ -12,7 +12,6 @@ the popular WP blog url structure "YYYY-MM/slug", be warned that Refinery just u
 So your inner site links will point to the old WP url. 
 
 == TODO
-- categories
 - tags
 - attachments
   - what about wordpress suffixes like -300x290 ?
