@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.name        = "wordpress-import"
   s.summary     = "Import WordPress XML dumps into your Ruby on Rails app."
   s.description = "This gem imports a WordPress XML dump into Rails (Page, User, BlogPost, BlogCategory, Tag, BlogComment)"
-  s.version     = "0.4.2"
+  s.version     = "0.4.3"
   s.date        = "2014-03-12"
 
   s.authors     = ['Will Bradley']
