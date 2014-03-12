@@ -49,7 +49,8 @@ namespace :wordpress do
     Rake::Task["environment"].invoke
     
     # scrape images
-    ::Post.all.each do |post|
+    @posts = ::Post.all
+    @posts.each do |post|
       doc = Nokogiri::HTML(post.body)
       doc.css("img").each do |img|
         # find remote file path
@@ -57,34 +58,35 @@ namespace :wordpress do
         # load uri
         begin
           remote_uri = URI(remote_file)
-
-          # only download if the image is a LFA-hosted image
-          if remote_uri.host.match(params[:host_match]) != nil
-            # find a local path for it
-            local_file = File.expand_path(File.join(Rails.public_path,remote_uri.path))
-            # only download if not already there
-            unless File.exists?(local_file)
-              # create local folders if necessary
-              dirname = File.dirname(local_file)
-              unless File.directory?(dirname)
-                FileUtils.mkdir_p(dirname)
-              end
-              # save remote file to local
-              begin
-                File.open(local_file,'wb'){ |f| f.write(open(remote_file).read) }
-                puts "Saved file #{remote_file}: #{local_file}"
-              rescue OpenURI::HTTPError => error
-                puts "Error saving file #{remote_file}: #{error.message}"
-              end
-            end
-          end
-
         rescue => error
-          puts "Error loading #{remote_file}: #{error.message}"
+          puts "Error parsing URL #{remote_file}: #{error.message}"
         end
 
+        # only download if the image is a LFA-hosted image
+        if remote_uri && remote_uri.host.match(params[:host_match]) != nil
+          # find a local path for it
+          local_file = File.expand_path(File.join(Rails.public_path,remote_uri.path))
+          # only download if not already there or if it's zero bytes
+          unless File.size?(local_file)
+            # create local folders if necessary
+            dirname = File.dirname(local_file)
+            unless File.directory?(dirname)
+              FileUtils.mkdir_p(dirname)
+            end
+            # save remote file to local
+            begin
+              remote_file_io = open(remote_file)
+              File.open(local_file,'wb'){ |f| f.write(remote_file_io.read) }
+              puts "Saved file: #{File.basename(local_file)}"
+            rescue OpenURI::HTTPError => error
+              puts "Error saving file #{remote_file}: #{error.message}"
+            end
+          end
+        end
       end
     end
+    puts "Finished downloding images from #{@posts.count} posts"
+
   end
 
   # desc "Reset the cms relevant tables for a clean import"
