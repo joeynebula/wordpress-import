@@ -44,10 +44,12 @@ namespace :wordpress do
 
   desc "download images in posts to public folder"
   task :download_post_images, :host_match do |task, params|
-    raise "Error: you must specify a host to match for this download (i.e. rake wordpress:download_post_images['mywebsite']" if params[:uri_match].blank?
+    raise "Error: you must specify a host to match for this download (i.e. rake wordpress:download_post_images['mywebsite']" if params[:host_match].blank?
 
+    Rake::Task["environment"].invoke
+    
     # scrape images
-    Post.all.each do |post|
+    ::Post.all.each do |post|
       doc = Nokogiri::HTML(post.body)
       doc.css("img").each do |img|
         # find remote file path
@@ -57,7 +59,7 @@ namespace :wordpress do
           remote_uri = URI(remote_file)
 
           # only download if the image is a LFA-hosted image
-          if remote_uri.host.match(params[:uri_match]) != nil
+          if remote_uri.host.match(params[:host_match]) != nil
             # find a local path for it
             local_file = File.expand_path(File.join(Rails.public_path,remote_uri.path))
             # only download if not already there
@@ -83,6 +85,7 @@ namespace :wordpress do
 
       end
     end
+  end
 
   # desc "Reset the cms relevant tables for a clean import"
   # task :reset_pages do
