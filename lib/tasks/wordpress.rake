@@ -77,7 +77,7 @@ namespace :wordpress do
             begin
               remote_file_io = open(remote_file)
               File.open(local_file,'wb'){ |f| f.write(remote_file_io.read) }
-              puts "Saved file: #{File.basename(local_file)}"
+              puts "Saved file: #{local_file}"
             rescue OpenURI::HTTPError => error
               puts "Error saving file #{remote_file}: #{error.message}"
             end
