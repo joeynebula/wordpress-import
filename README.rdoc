@@ -1,8 +1,10 @@
 = Wordpress-import
 
-Fork of Marc Remolt's Refinerycms-wordpress-import ( https://github.com/mremolt/refinerycms-wordpress-import )
+This little project is an importer for WordPress XML dumps into Rails.
 
-This little project is an importer for WordPress XML dumps into Rails
+It's been somewhat customized for one particular project; you probably want to fork this and modify it to fit your app's schema.
+
+It's a fork of Marc Remolt's Refinerycms-wordpress-import ( https://github.com/mremolt/refinerycms-wordpress-import )
 
 You can find the source code on github: https://github.com/zyphlar/wordpress-import
 
@@ -10,11 +12,6 @@ Keep in mind that links to other pages of your blog are just copied, as WordPres
 If your site (blog) structure uses new urls, the links WILL break! For example, if you used 
 the popular WP blog url structure "YYYY-MM/slug", be warned that Refinery just uses "blog/slug". 
 So your inner site links will point to the old WP url. 
-
-== TODO
-- tags
-- attachments
-  - what about wordpress suffixes like -300x290 ?
 
 == Prerequisites
 
@@ -29,7 +26,7 @@ Just add the gem to your projects Gemfile:
 
 Or if you want to stay on the bleeding edge: 
 
-  gem 'wordpress-import', :git => 'git://github.com/zyphlarz/wordpress-import.git'
+  gem 'wordpress-import', :git => 'git://github.com/zyphlar/wordpress-import.git'
 
 and run
 

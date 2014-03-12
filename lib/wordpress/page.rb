@@ -13,6 +13,10 @@ module WordPressImport
       "WordPress::Page(#{post_id}): #{title}"     
     end
 
+    def link
+      node.xpath("link").text
+    end
+
     def title
       node.xpath("title").text
     end

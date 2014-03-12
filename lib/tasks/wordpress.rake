@@ -13,9 +13,9 @@ namespace :wordpress do
   end
 
   desc "import blog data from a WordPressImport XML dump"
-  task :import_blog, :file_name do |task, params|
+  task :import_blog, :file_name, :blog_slug do |task, params|
     Rake::Task["environment"].invoke
-    p "Loading XML from #{params[:file_name]} ..."
+    p "Loading XML from #{params[:file_name]} (using blog #{params[:blog_slug]}) ..."
     dump = WordPressImport::Dump.new(params[:file_name])
 
     p "Importing #{dump.authors.count} authors ..."
@@ -31,14 +31,14 @@ namespace :wordpress do
       p "(export ONLY_PUBLISHED=true to import only published posts)"
     end
 
-    dump.posts(only_published).each(&:to_rails)
+    dump.posts(only_published).each{|p| p.to_rails(params[:blog_slug]) }
   end
 
   desc "reset blog tables and then import blog data from a WordPressImport XML dump"
-  task :reset_and_import_blog, :file_name do |task, params|
+  task :reset_and_import_blog, :file_name, :blog_slug do |task, params|
     Rake::Task["environment"].invoke
     Rake::Task["wordpress:reset_blog"].invoke
-    Rake::Task["wordpress:import_blog"].invoke(params[:file_name])
+    Rake::Task["wordpress:import_blog"].invoke(params[:file_name], params[:blog_slug])
   end
 
 
@@ -129,19 +129,12 @@ namespace :wordpress do
   end
 
   desc "reset and import all data (see the other tasks)"
-  task :full_import, :file_name do |task, params|
+  task :full_import, :file_name, :blog_slug do |task, params|
     Rake::Task["environment"].invoke
-    Rake::Task["wordpress:reset_and_import_blog"].invoke(params[:file_name])
+    Rake::Task["wordpress:reset_and_import_blog"].invoke(params[:file_name],params[:blog_slug])
     #Rake::Task["wordpress:reset_and_import_pages"].invoke(params[:file_name])
     #Rake::Task["wordpress:reset_import_and_replace_media"].invoke(params[:file_name])
     Rake::Task["wordpress:import_and_replace_media"].invoke(params[:file_name])
   end
 
-
-  desc "Local First master import (no resets)"
-  task :lfa_import, :file_name do |task, params|
-    Rake::Task["environment"].invoke
-    Rake::Task["wordpress:import_blog"].invoke(params[:file_name])
-    Rake::Task["wordpress:import_and_replace_media"].invoke(params[:file_name])
-  end
 end

@@ -38,6 +38,9 @@ module WordPressImport
         user.password_confirmation = 'password'
       end
       user.save
+
+      puts "User #{login} imported."
+
       user
     end
   end

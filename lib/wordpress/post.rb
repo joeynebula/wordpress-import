@@ -29,7 +29,8 @@ module WordPressImport
       end
     end
 
-    def to_rails
+    # blog_slug is used to identify which blog this import is from
+    def to_rails(blog_slug)
 
       user = ::User.find_by_wp_username(creator)
 
@@ -37,34 +38,24 @@ module WordPressImport
         raise "User with wp_username #{creator} not found"
       end
 
-      post = ::Post.find_or_initialize_by(:id => post_id, :slug => post_name)
-
-      post.assign_attributes( 
+      post = ::Post.create({ 
+        :wp_post_id => post_id, :slug => post_name,
         :user_id => user.id, :title => title, 
         :created_at => post_date, 
-        :published_at => publish_date)
-      # :body => content_formatted taken care of by translation below
-
-      if post.translations.blank?
-        translation = post.translations.build
-      else
-        translation = post.translations.first
-      end
-      
-      translation.locale = "en"
-      translation.title = title
-      translation.body = content_formatted
-
-      # merge the translation's category list with the wordpress post's
-      translation.category_list |= categories.collect(&:name)
-      # and tags
-      translation.category_list |= tags.collect(&:name)
-
-      translation.save
-      
-      post.save
+        :published_at => publish_date,
+        :wp_link => link,
+        :wp_blog => blog_slug,
+        :translations_attributes => { "0" => {
+            :locale => "en",
+            :title => title,
+            :body => content_formatted,
+            # merge the translation's category list with the wordpress post's
+            :category_list => categories.collect(&:name) | tags.collect(&:name) 
+          }}
+        })
 
       if post.errors.blank?
+        puts "Post #{post_name} imported."
         return post.reload
       else
         puts post.inspect
