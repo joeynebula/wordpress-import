@@ -42,6 +42,48 @@ namespace :wordpress do
   end
 
 
+  desc "download images in posts to public folder"
+  task :download_post_images, :host_match do |task, params|
+    raise "Error: you must specify a host to match for this download (i.e. rake wordpress:download_post_images['mywebsite']" if params[:uri_match].blank?
+
+    # scrape images
+    Post.all.each do |post|
+      doc = Nokogiri::HTML(post.body)
+      doc.css("img").each do |img|
+        # find remote file path
+        remote_file = img.attributes["src"].text
+        # load uri
+        begin
+          remote_uri = URI(remote_file)
+
+          # only download if the image is a LFA-hosted image
+          if remote_uri.host.match(params[:uri_match]) != nil
+            # find a local path for it
+            local_file = File.expand_path(File.join(Rails.public_path,remote_uri.path))
+            # only download if not already there
+            unless File.exists?(local_file)
+              # create local folders if necessary
+              dirname = File.dirname(local_file)
+              unless File.directory?(dirname)
+                FileUtils.mkdir_p(dirname)
+              end
+              # save remote file to local
+              begin
+                File.open(local_file,'wb'){ |f| f.write(open(remote_file).read) }
+                puts "Saved file #{remote_file}: #{local_file}"
+              rescue OpenURI::HTTPError => error
+                puts "Error saving file #{remote_file}: #{error.message}"
+              end
+            end
+          end
+
+        rescue => error
+          puts "Error loading #{remote_file}: #{error.message}"
+        end
+
+      end
+    end
+
   # desc "Reset the cms relevant tables for a clean import"
   # task :reset_pages do
   #   Rake::Task["environment"].invoke
