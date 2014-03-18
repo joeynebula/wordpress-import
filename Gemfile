@@ -6,7 +6,7 @@ gem "rails", "4.0.0"
 #gem "capybara", ">= 1.0.0.beta1"
 gem "sqlite3"
 gem "rmagick"
-gem 'shortcode', :git => 'git@github.com:kernow/shortcode.git'
+gem 'shortcode', "0.1.2"
 
 group :development, :test do
   gem 'byebug'

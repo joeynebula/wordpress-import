@@ -1,15 +1,7 @@
-GIT
-  remote: git@github.com:kernow/shortcode.git
-  revision: 24516374d7571034aae2817401656cf0af5e6bf7
-  specs:
-    shortcode (0.1.1)
-      haml (~> 4.0)
-      parslet (= 1.5.0)
-
 PATH
   remote: ./
   specs:
-    wordpress-import (0.4.3)
+    wordpress-import (0.4.4)
       bundler (~> 1.0)
       nokogiri (~> 1.6.0)
       shortcode (~> 0.1.1)
@@ -141,6 +133,9 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
+    shortcode (0.1.2)
+      haml (~> 4.0)
+      parslet (= 1.5.0)
     slop (3.5.0)
     sprockets (2.12.0)
       hike (~> 1.2)
@@ -176,6 +171,6 @@ DEPENDENCIES
   rails (= 4.0.0)
   rmagick
   rspec-rails (>= 2.6.0)
-  shortcode!
+  shortcode (= 0.1.2)
   sqlite3
   wordpress-import!
