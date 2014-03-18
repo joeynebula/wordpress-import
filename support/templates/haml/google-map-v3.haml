@@ -1,0 +1,37 @@
+- addmarkerlist = @attributes[:addmarkerlist].to_s || ""
+
+- name = addmarkerlist.split("{}").last
+- uri_name = URI::encode(name)
+- uri_address = URI::encode(addmarkerlist.split("{}").first)
+
+-# google will open up the business page if we pass it a name
+- uri_address = "#{uri_name},%20#{uri_address}" unless (uri_name == uri_address || name.blank?) 
+
+- gmaps_url = "https://maps.google.com/maps/?q=#{uri_address}&amp;ie=UTF8&amp;t=m"
+<iframe src="#{gmaps_url}&amp;output=embed" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="#{@attributes[:width]}" height="#{@attributes[:height]}"></iframe>
+<small>View <a href="#{gmaps_url}">#{name}</a> in a larger map</small>
+
+
+-# [google-map-v3 width="425" 
+  height="350" 
+  zoom="12" 
+  maptype="roadmap" 
+  mapalign="left" 
+  directionhint="false" 
+  language="default" 
+  poweredby="false" 
+  maptypecontrol="true" 
+  pancontrol="true" 
+  zoomcontrol="true" 
+  scalecontrol="true" 
+  streetviewcontrol="true" 
+  scrollwheelcontrol="false" 
+  draggable="true" 
+  tiltfourtyfive="false" 
+  addmarkermashupbubble="false" 
+  addmarkermashupbubble="false" 
+  addmarkerlist="#1 Dream Manor Dr Globe, AZ{}1-default.png{}Dream Manor Inn" 
+  bubbleautopan="true" 
+  showbike="false" 
+  showtraffic="false" 
+  showpanoramio="false"]

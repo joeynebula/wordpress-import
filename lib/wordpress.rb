@@ -1,5 +1,6 @@
 require 'nokogiri'
 require "wordpress/railtie" 
+require 'shortcode'
 
 module WordPressImport
 autoload :Author, 'wordpress/author' 

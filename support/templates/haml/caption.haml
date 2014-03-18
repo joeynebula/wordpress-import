@@ -1,0 +1,24 @@
+-# disabling style_hash for now; setting the width = width+10 doesn't seem to actually be a good thing
+-# style_hash = {:style => "width: #{@attributes[:width].to_i+10}px"} unless @attributes[:width].blank?
+- figure_hash = {:class => @attributes[:align], :id => @attributes[:id]}
+-# figure_hash = figure_hash.merge(style_hash) if style_hash
+- content_image = Nokogiri::HTML(@content).css("img").to_html
+- content_caption = Nokogiri::HTML(@content).text + " #{@attributes[:caption]}"
+- @content = "#{content_image} <figcaption>#{content_caption}</figcaption>" unless content_image.blank?
+%figure{figure_hash}= @content
+
+-# sample wordpress-y css to go along with this html:
+  figure {
+    background: #f1f1f1;
+    margin-bottom: 20px;
+    padding: 4px;
+    text-align: center;
+  }
+  figure img {
+    margin: 5px 5px 0;
+  }
+  figure figcaption {
+    color: #777;
+    font-size: 12px;
+    margin: 5px 5px 24px; 
+  }

@@ -26,7 +26,7 @@ module WordPressImport
     end
 
     def content_formatted
-      formatted = format_syntax_highlighter(format_paragraphs(content))
+      formatted = format_shortcodes(format_syntax_highlighter(format_paragraphs(content)))
 
       # remove all tags inside <pre> that simple_format created
       # TODO: replace format_paragraphs with a method, that ignores pre-tags
@@ -103,8 +103,8 @@ module WordPressImport
       text = ''.html_safe if text.nil?
       start_tag = tag('p', html_options, true)
       
-      text.gsub!(/\r?\n/, "<br/>\n")               # \r\n and \n -> line break
-      text.gsub!(/\n\n+/, "</p>\n\n#{start_tag}")  # 2+ newline  -> paragraph
+      text.gsub!(/\n\n+/, "</p>#{start_tag}")  # 2+ newline  -> paragraph
+      text.gsub!(/\r?\n/, "<br/>\n")               # \r\n and \n -> line break (must be after the paragraph detection to avoid <br/><br/>)
       text.insert 0, start_tag
 
       text.html_safe.safe_concat("</p>")
@@ -120,6 +120,25 @@ module WordPressImport
       # [ruby]p "Hello World"[/ruby] 
       # -> <pre class="brush: ruby">p "Hello world"</pre> 
       text.gsub(/\[(\w+)\](.+?)\[\/\1\]/m, '<pre class="brush: \1">\2</pre>')
+    end
+
+    # Replace Wordpress shortcodes with formatted HTML (see shortcode gem and support/templates folder)
+    def format_shortcodes(text)
+      Shortcode.setup do |config|
+        # the template parser to use
+        config.template_parser = :haml # :erb or :haml supported, :haml is default
+
+         # location of the template files
+        config.template_path = ::File.join(::File.dirname(__FILE__), "..", "..","support/templates/haml")
+
+        # a list of block tags to support e.g. [quote]Hello World[/quote]
+        config.block_tags = [:caption, :column]
+
+        # a list of self closing tags to support e.g. [youtube id="12345"]
+        config.self_closing_tags = [:end_columns, "google-map-v3"]
+      end
+
+      Shortcode.process(text)
     end
   end
 end
