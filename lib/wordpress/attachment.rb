@@ -37,7 +37,7 @@ module WordPressImport
     end
 
     def image?
-      url.match /\.(png|jpg|jpeg|gif)$/ 
+      url.match /\.(png|jpg|jpeg|gif)$/
     end
 
     def to_rails
@@ -138,7 +138,7 @@ module WordPressImport
     def replace_image_url_in_blog_posts
       replace_url_in_blog_posts(paperclip_image.rich_file.url)
     end
-    
+
     def replace_image_url_in_pages
       replace_url_in_pages(paperclip_image.rich_file.url)
     end
@@ -146,13 +146,13 @@ module WordPressImport
     def replace_resource_url_in_blog_posts
       replace_url_in_blog_posts(paperclip_file.rich_file.url)
     end
-    
+
     def replace_resource_url_in_pages
       replace_url_in_pages(paperclip_file.rich_file.url)
     end
 
     def replace_url_in_blog_posts(new_url)
-      ::Post.all.each do |post|
+      Refinery::Post.all.each do |post|
         if (! post.body.empty?) && post.body.include?(url)
           @occurrance_count += 1
           post.body = post.body.gsub(url_pattern, new_url)
@@ -162,7 +162,7 @@ module WordPressImport
     end
 
     def replace_url_in_pages(new_url)
-      ::Page.all.each do |page|
+      Refinery::Page.all.each do |page|
         page.translations.each do |translation|
           translation.parts.each do |part|
             if (! part.content.to_s.blank?) && part.content.include?(url)

@@ -29,7 +29,7 @@ module WordPressImport
     end
 
     def to_rails
-      user = ::User.find_or_initialize_by_email(email)
+      user = Refinery::User.find_or_initialize_by_email(email)
       user.wp_username = login
 
       unless user.persisted?

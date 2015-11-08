@@ -11,7 +11,7 @@ module WordPressImport
     end
 
     def to_rails
-      Tag.find_or_create_by_title(name)
+      Refinery::Tag.find_or_create_by_title(name)
     end
   end
 end

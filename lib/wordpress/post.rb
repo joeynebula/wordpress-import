@@ -8,7 +8,7 @@ module WordPressImport
         "category[@domain='tag']"
       end
 
-      node.xpath(path).collect do |tag_node| 
+      node.xpath(path).collect do |tag_node|
         Tag.new(tag_node.text)
       end
     end
@@ -32,16 +32,16 @@ module WordPressImport
     # blog_slug is used to identify which blog this import is from
     def to_rails(blog_slug)
 
-      user = ::User.find_by_wp_username(creator)
+      user = Refinery::User.find_by_wp_username(creator)
 
-      if user.nil? 
+      if user.nil?
         raise "User with wp_username #{creator} not found"
       end
 
-      post = ::Post.create({ 
+      post = Refinery::Post.create({
         :wp_post_id => post_id, :slug => post_name,
-        :user_id => user.id, :title => title, 
-        :created_at => post_date, 
+        :user_id => user.id, :title => title,
+        :created_at => post_date,
         :published_at => publish_date,
         :wp_link => link,
         :wp_blog => blog_slug,
@@ -50,7 +50,7 @@ module WordPressImport
             :title => title,
             :body => content_formatted,
             # merge the translation's category list with the wordpress post's
-            :category_list => categories.collect(&:name) | tags.collect(&:name) 
+            :category_list => categories.collect(&:name) | tags.collect(&:name)
           }}
         })
 
