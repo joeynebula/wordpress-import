@@ -32,13 +32,13 @@ module WordPressImport
     # blog_slug is used to identify which blog this import is from
     def to_rails(blog_slug)
 
-      user = Refinery::User.find_by_wp_username(creator)
+      user = ::RefineryAuthenticationDeviseUser.find_by_wp_username(creator)
 
       if user.nil?
         raise "User with wp_username #{creator} not found"
       end
 
-      post = Refinery::Post.create({
+      post = ::RefineryBlogPost.create({
         :wp_post_id => post_id, :slug => post_name,
         :user_id => user.id, :title => title,
         :created_at => post_date,

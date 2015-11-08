@@ -35,7 +35,7 @@ module WordPressImport
     end
 
     def to_refinery
-      comment = Refinery::BlogComment.new :name => author, :email => email
+      comment = ::RefineryBlogComment.new :name => author, :email => email
 
       comment.body = content
       comment.created_at = date

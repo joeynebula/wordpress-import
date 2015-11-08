@@ -10,7 +10,7 @@ module WordPressImport
     end
 
     def inspect
-      "WordPress::Page(#{post_id}): #{title}"     
+      "WordPress::Page(#{post_id}): #{title}"
     end
 
     def link
@@ -30,10 +30,10 @@ module WordPressImport
 
       # remove all tags inside <pre> that simple_format created
       # TODO: replace format_paragraphs with a method, that ignores pre-tags
-      formatted.gsub!(/(<pre.*?>)(.+?)(<\/pre>)/m) do |match| 
+      formatted.gsub!(/(<pre.*?>)(.+?)(<\/pre>)/m) do |match|
         "#{$1}#{strip_tags($2)}#{$3}"
       end
-        
+
       formatted
     end
 
@@ -89,12 +89,12 @@ module WordPressImport
 
     def to_rails
       # :user_id => creator
-      page = ::Page.create!(:id => post_id, :title => title, 
-        :created_at => post_date, :slug => post_name, 
+      page = ::RefineryPage.create!(:id => post_id, :title => title, 
+        :created_at => post_date, :slug => post_name,
         :published_at => publish_date, :body => content_formatted)
     end
 
-    private 
+    private
 
     def format_paragraphs(text, html_options={})
       # WordPress doesn't export <p>-Tags, so let's run a simple_format over
@@ -102,7 +102,7 @@ module WordPressImport
       # inspired by the simple_format rails helper
       text = ''.html_safe if text.nil?
       start_tag = tag('p', html_options, true)
-      
+
       text.gsub!(/\n\n+/, "</p>#{start_tag}")  # 2+ newline  -> paragraph
       text.gsub!(/\r?\n/, "<br/>\n")               # \r\n and \n -> line break (must be after the paragraph detection to avoid <br/><br/>)
       text.insert 0, start_tag
@@ -115,10 +115,10 @@ module WordPressImport
       # In WordPress you can (via a plugin) enclose code in [lang][/lang]
       # blocks, which are converted to a <pre>-tag with a class corresponding
       # to the language.
-      # 
+      #
       # Example:
-      # [ruby]p "Hello World"[/ruby] 
-      # -> <pre class="brush: ruby">p "Hello world"</pre> 
+      # [ruby]p "Hello World"[/ruby]
+      # -> <pre class="brush: ruby">p "Hello world"</pre>
       text.gsub(/\[(\w+)\](.+?)\[\/\1\]/m, '<pre class="brush: \1">\2</pre>')
     end
 
